@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>ERP.Domain</RootNamespace>
+  </PropertyGroup>
+
+  <!--
+    The Domain layer depends on NOTHING.
+    No EF Core, no ASP.NET, no MediatR. Only the BCL.
+    If you ever feel the urge to add a package here, the design is drifting.
+  -->
+
+</Project>

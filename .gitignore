@@ -1,0 +1,27 @@
+## Build output
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+artifacts/
+*.user
+*.suo
+
+## IDE
+.vs/
+.vscode/
+.idea/
+*.DotSettings.user
+
+## Logs
+logs/
+*.log
+
+## Secrets - never commit these
+appsettings.*.local.json
+secrets.json
+*.pfx
+
+## Local database files
+*.mdf
+*.ldf

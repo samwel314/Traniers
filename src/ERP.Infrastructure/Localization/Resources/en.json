@@ -1,0 +1,55 @@
+{
+  "Validation": {
+    "Required": "This field is required.",
+    "MaxLength": "Must not exceed {0} characters.",
+    "MinLength": "Must be at least {0} characters.",
+    "GreaterThanZero": "Must be greater than zero.",
+    "InvalidFormat": "The format is not valid.",
+    "InvalidEmail": "Please enter a valid email address.",
+    "NotFound": "The requested record was not found.",
+    "AlreadyExists": "This record already exists.",
+    "Title": "Validation failed",
+    "Detail": "One or more fields are invalid. Please review and try again."
+  },
+
+  "Error": {
+    "Unexpected": "An unexpected error occurred. Please try again later.",
+    "Unexpected.Title": "Server error",
+    "NotFound.Title": "Not found",
+    "Conflict.Title": "Conflict",
+    "Unauthorized": "You must sign in to perform this action.",
+    "Unauthorized.Title": "Not authenticated",
+    "Forbidden": "You do not have permission to perform this action.",
+    "Forbidden.Title": "Access denied",
+    "Concurrency": "This record was changed by another user. Please reload and try again.",
+    "RequestCancelled": "The request was cancelled."
+  },
+
+  "Academy": {
+    "Player": {
+      "NotFound": "The requested player was not found.",
+      "CodeRequired": "Player code is required.",
+      "CodeInvalidFormat": "Player code must be 3 to 32 letters, digits or dashes.",
+      "CodeAlreadyExists": "A player with the same code already exists.",
+      "NationalIdAlreadyExists": "A player with the same national ID is already enrolled.",
+      "NationalIdInvalidFormat": "National ID must be 14 digits.",
+      "PhoneInvalidFormat": "Invalid mobile number. Expected format: 01xxxxxxxxx.",
+      "NameRequired": "Player name is required in at least one language.",
+      "AgeOutOfRange": "Player age must be between {0} and {1} years.",
+      "BirthDateInFuture": "Date of birth cannot be in the future.",
+      "GuardianRequired": "A guardian name and phone are required for players under 18.",
+      "FeeNegative": "Monthly fee cannot be negative.",
+      "EnrollmentDateInFuture": "Enrollment date cannot be in the future."
+    }
+  },
+
+  "Identity": {
+    "InvalidCredentials": "Incorrect user name or password.",
+    "UserLockedOut": "The account is locked. Please try again later.",
+    "UserInactive": "This account is disabled.",
+    "UserNotFound": "User not found.",
+    "RegistrationFailed": "Registration failed.",
+    "InvalidRefreshToken": "The session has expired. Please sign in again.",
+    "RoleNotFound": "Role not found."
+  }
+}
