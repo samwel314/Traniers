@@ -16,6 +16,5 @@ public abstract class AuditableEntity : Entity, IAuditable, ISoftDeletable, IHas
     public bool IsDeleted { get; set; }
     public DateTimeOffset? DeletedAtUtc { get; set; }
     public string? DeletedBy { get; set; }
-
     public Guid TenantId { get; set; }
 }

@@ -42,7 +42,8 @@ public static class DependencyInjection
             ?? throw new InvalidOperationException("ConnectionStrings:Default is not configured.");
 
         services.AddScoped<AuditableEntityInterceptor>();
-
+        services.AddScoped<IImageService , ImageService>();
+        services.AddScoped<IApplicationDbContext, ApplicationDbContext>(); 
         services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {
             options.UseSqlServer(connectionString, sql =>

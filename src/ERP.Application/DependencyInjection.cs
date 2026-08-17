@@ -1,7 +1,8 @@
-using System.Reflection;
 using ERP.Application.Common.Services;
+using ERP.Application.Modules.Academy;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace ERP.Application;
 
@@ -19,7 +20,7 @@ public static class DependencyInjection
 
         services.AddScoped<IInputValidator, InputValidator>();
         services.AddScoped<IPermissionGuard, PermissionGuard>();
-
+        services.AddScoped<IAcademyService, AcademyService>();
         services.AddValidatorsFromAssembly(assembly, includeInternalTypes: true);
 
         services.AddModuleServices(assembly);

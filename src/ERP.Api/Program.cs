@@ -1,11 +1,13 @@
 using ERP.Api.Extensions;
 using ERP.Api.Middleware;
 using ERP.Application;
+using ERP.Application.Common.Validation;
 using ERP.Infrastructure;
 using ERP.Infrastructure.Persistence;
+using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Options;
 using Serilog;
 
 // A bootstrap logger so failures *during* startup are still captured.
@@ -31,6 +33,7 @@ try
     builder.Services.AddApplication();
     builder.Services.AddInfrastructure(builder.Configuration);
     builder.Services.AddPresentation(builder.Configuration);
+
 
     var app = builder.Build();
 

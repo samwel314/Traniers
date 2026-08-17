@@ -1,5 +1,7 @@
+using ERP.Application.Common.Abstractions.Persistence;
 using ERP.Application.Common.Abstractions.Services;
 using ERP.Domain.Common;
+using ERP.Domain.Modules.Academy.Entities;
 using ERP.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +18,7 @@ namespace ERP.Infrastructure.Persistence;
 public sealed class ApplicationDbContext(
     DbContextOptions<ApplicationDbContext> options,
     ICurrentUser currentUser)
-    : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>(options)
+    : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>(options) , IApplicationDbContext
 {
     /// <summary>
     /// Captured once per context instance. Used by the tenant query filter below;
@@ -26,6 +28,8 @@ public sealed class ApplicationDbContext(
 
     /// <summary>Set to true by maintenance jobs / seeders that must see every tenant.</summary>
     public bool IgnoreTenantFilter { get; set; }
+
+    public DbSet<Academy> Academies { get; set;  }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

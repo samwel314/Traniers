@@ -8,7 +8,7 @@ namespace ERP.Infrastructure.Persistence.Configurations;
 /// Maps the Player entity to its table. Discovered automatically by
 /// ApplyConfigurationsFromAssembly - the DbContext was never edited to add it.
 /// </summary>
-internal sealed class PlayerConfiguration : IEntityTypeConfiguration<Player>
+internal sealed partial class PlayerConfiguration : IEntityTypeConfiguration<Player>
 {
     public void Configure(EntityTypeBuilder<Player> builder)
     {

@@ -40,7 +40,10 @@
       "GuardianRequired": "A guardian name and phone are required for players under 18.",
       "FeeNegative": "Monthly fee cannot be negative.",
       "EnrollmentDateInFuture": "Enrollment date cannot be in the future."
-    }
+    },
+    "NameAlreadyExists": "Academy name already exists.",
+    "InvalidLogo": "The provided logo is invalid.",
+    "NotFound": "Academy was not found."
   },
 
   "Identity": {

@@ -26,11 +26,9 @@ public class Player : AuditableEntity
     // Most players are minors, so the guardian is who the academy actually calls.
     public string GuardianName { get; set; } = string.Empty;
     public string GuardianPhone { get; set; } = string.Empty;
-
     public string? Phone { get; set; }
     public string? Email { get; set; }
     public string? Notes { get; set; }
-
     public DateOnly EnrollmentDate { get; set; }
     public decimal MonthlyFee { get; set; }
     public string Currency { get; set; } = "EGP";
