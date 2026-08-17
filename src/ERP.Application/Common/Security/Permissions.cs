@@ -15,21 +15,36 @@ public static class Permissions
         public const string CreatePlayer = "Academy.Players.Create";
         public const string UpdatePlayer = "Academy.Players.Update";
         public const string DeletePlayer = "Academy.Players.Delete";
-    }
+        public const string ViewAcademy = "Academy.View";
+        public const string UpdateAcademy = "Academy.Update";
+        public const string CreateAcademy = "Academy.Create";
+        public const string DeleteAcademy = "Academy.Delete";
 
+    }
+    public static IReadOnlyList<string> AdminPermissions =>
+[
+    Academy.ViewAcademy,
+    Academy.ViewPlayers,
+    Academy.CreatePlayer,
+    Academy.UpdatePlayer,
+    Academy.DeletePlayer
+];
     public static IReadOnlyList<string> All =>
     [
         Academy.ViewPlayers,
         Academy.CreatePlayer,
         Academy.UpdatePlayer,
-        Academy.DeletePlayer
+        Academy.DeletePlayer, 
+        Academy.ViewAcademy,
+        Academy.UpdateAcademy,
+        Academy.CreateAcademy,
+        Academy.DeleteAcademy
     ];
 }
-
 public static class Roles
 {
     public const string Administrator = "Administrator";
     public const string Viewer = "Viewer";
-
+    public const string AcademyAdministrator = "AcademyAdministrator"; 
     public static IReadOnlyList<string> All => [Administrator, Viewer];
 }

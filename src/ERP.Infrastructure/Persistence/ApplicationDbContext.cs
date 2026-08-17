@@ -28,7 +28,7 @@ public sealed class ApplicationDbContext(
 
     /// <summary>Set to true by maintenance jobs / seeders that must see every tenant.</summary>
     public bool IgnoreTenantFilter { get; set; }
-
+    public DbSet<AcademyAdministrator> AcademyAdministrators {  get; set; }
     public DbSet<Academy> Academies { get; set;  }
 
     protected override void OnModelCreating(ModelBuilder builder)
