@@ -1,5 +1,6 @@
 using ERP.Application.Common.Services;
 using ERP.Application.Modules.Academy;
+using ERP.Application.Modules.AcademyAdmin;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -21,6 +22,7 @@ public static class DependencyInjection
         services.AddScoped<IInputValidator, InputValidator>();
         services.AddScoped<IPermissionGuard, PermissionGuard>();
         services.AddScoped<IAcademyService, AcademyService>();
+        services.AddScoped<IAcademyAdministratorService, AcademyAdministratorService>(); 
         services.AddValidatorsFromAssembly(assembly, includeInternalTypes: true);
 
         services.AddModuleServices(assembly);

@@ -1,13 +1,17 @@
 using ERP.Application.Common.Models;
+using ERP.Application.Common.Security;
 using ERP.Application.Modules.Academy;
 using ERP.Application.Modules.Academy.AcademyInput;
 using ERP.Application.Modules.Academy.AcademyOutput;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ERP.Api.Controllers;
 
 [Route("api/[controller]")]
 [Tags("Academies")]
+[Authorize(Roles = Roles.Administrator)]
+
 public class AcademiesController : ApiControllerBase
 {
     private readonly IAcademyService _academyService;

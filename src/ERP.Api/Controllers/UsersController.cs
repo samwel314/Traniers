@@ -1,6 +1,7 @@
 using ERP.Application.Common.Abstractions.Identity;
 using ERP.Application.Common.Abstractions.Services;
 using ERP.Application.Common.Security;
+using ERP.Application.Modules.AcademyAdmin;
 using ERP.Application.Modules.User.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ERP.Api.Controllers;
 
 [Authorize(Roles = Roles.Administrator)]
-public sealed class UsersController(
+public sealed partial class UsersController(
     IIdentityService identityService ) : ApiControllerBase
 {
     /// <summary>

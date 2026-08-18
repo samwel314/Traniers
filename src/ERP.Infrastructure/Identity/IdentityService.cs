@@ -151,22 +151,44 @@ public sealed class IdentityService(
     }
 
 
-    public async Task<Result<AuthenticatedUser>> GetUserAsync(
-        Guid userId,
-        CancellationToken cancellationToken = default)
+public async Task<Result<AuthenticatedUser>> GetUserAsync(
+    Guid userId,
+    CancellationToken cancellationToken = default)
+{
+    var user = await userManager.FindByIdAsync(userId.ToString());
+
+    if (user is null)
+        return Result.Failure<AuthenticatedUser>(
+            IdentityErrors.UserNotFound);
+
+    var roles = await userManager.GetRolesAsync(user);
+
+    var permissions = new HashSet<string>();
+
+    foreach (var roleName in roles)
     {
-        var user = await userManager.FindByIdAsync(userId.ToString());
-        if (user is null)
-            return Result.Failure<AuthenticatedUser>(IdentityErrors.UserNotFound);
+        var role = await roleManager.FindByNameAsync(roleName);
 
-        var roles = await userManager.GetRolesAsync(user);
+        if (role is null)
+            continue;
 
-        return Result.Success(new AuthenticatedUser(
+        var claims = await roleManager.GetClaimsAsync(role);
+
+        foreach (var claim in claims)
+        {
+            if (claim.Type == ErpClaims.Permission)
+                permissions.Add(claim.Value);
+        }
+    }
+
+    return Result.Success(
+        new AuthenticatedUser(
             user.Id,
             user.UserName ?? string.Empty,
             user.Email ?? string.Empty,
-            [.. roles]));
-    }
+            [.. roles],
+            [.. permissions]));
+}
 
     private async Task<AuthTokens> IssueTokensAsync(ApplicationUser user)
     {
@@ -233,6 +255,11 @@ public async Task<Result<IReadOnlyList<UserDto>>> GetUsersAsync(
 
     return Result.Success<IReadOnlyList<UserDto>>(users);
 }
+
+    public Task<bool> AnyUsersByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return userManager.Users.AnyAsync(u => u.Id == id , cancellationToken); 
+    }
 }
 
 /// <summary>Error codes mirrored by the Identity.* keys in ar.json / en.json.</summary>

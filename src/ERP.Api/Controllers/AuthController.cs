@@ -1,11 +1,13 @@
 using ERP.Application.Common.Abstractions.Identity;
+using ERP.Application.Common.Abstractions.Services;
+using ERP.Application.Modules.User.Contracts;
+using ERP.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ERP.Application.Modules.User.Contracts;
 namespace ERP.Api.Controllers;
 
 public sealed class AuthController(
-    IIdentityService identityService) : ApiControllerBase
+    IIdentityService identityService  , ICurrentUser currentUser) : ApiControllerBase
 {
     /// <summary>
     /// Authenticates a user and returns access and refresh tokens.
@@ -70,7 +72,18 @@ public sealed class AuthController(
 
         return ToActionResult(result);
     }
-
+    [HttpGet("access")]
+    [Authorize]
+    public IActionResult GetAccess()
+    {
+        return Ok(new
+        {
+            UserId = currentUser.UserId,
+            UserName = currentUser.UserName,
+            Roles = currentUser.Roles,
+            Permissions = currentUser.Permissions
+        });
+    }
     /// <summary>
     /// Gets the authenticated user's information.
     /// </summary>
@@ -97,4 +110,5 @@ public sealed class AuthController(
 
         return ToActionResult(result);
     }
+
 }
