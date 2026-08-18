@@ -24,7 +24,7 @@ public interface IIdentityService
     Task<Result<IReadOnlyList<UserDto>>> GetUsersAsync(CancellationToken cancellationToken = default);
     Task<Result<AuthTokens>> RefreshAsync(string refreshToken, CancellationToken cancellationToken = default);
 
-  //  Task<Result> AssignRoleAsync(Guid userId, string role, CancellationToken cancellationToken = default);
+    Task<Result> AssignRoleAsync(Guid userId, string role, CancellationToken cancellationToken = default);
 
     Task<Result<AuthenticatedUser>> GetUserAsync(Guid userId, CancellationToken cancellationToken = default);
 }

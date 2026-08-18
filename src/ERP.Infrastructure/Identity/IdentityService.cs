@@ -133,27 +133,23 @@ public sealed class IdentityService(
             await IssueTokensAsync(user));
     }
 
-    //public async Task<Result> AssignRoleAsync(Guid userId, string role, CancellationToken cancellationToken = default)
-    //{
-    //    var user = await userManager.FindByIdAsync(userId.ToString());
-    //    if (user is null)
-    //        return Result.Failure(IdentityErrors.UserNotFound);
+    public async Task<Result> AssignRoleAsync(Guid userId, string role, CancellationToken cancellationToken = default)
+    {
+        var user = await userManager.FindByIdAsync(userId.ToString());
+        if (user is null)
+            return Result.Failure(IdentityErrors.UserNotFound);
 
-    //    if (!await roleManager.RoleExistsAsync(role))
-    //        return Result.Failure(IdentityErrors.RoleNotFound);
+        if (!await roleManager.RoleExistsAsync(role))
+            return Result.Failure(IdentityErrors.RoleNotFound);
 
-    //    var result = await userManager.AddToRoleAsync(user, role);
+        var result = await userManager.AddToRoleAsync(user, role);
 
-    //    return result.Succeeded
-    //        ? Result.Success()
-    //        : Result.Failure(Error.Failure("Identity.RoleAssignmentFailed",
-    //            string.Join(" ", result.Errors.Select(e => e.Description))));
-    //}
+        return result.Succeeded
+            ? Result.Success()
+            : Result.Failure(Error.Failure("Identity.RoleAssignmentFailed",
+                string.Join(" ", result.Errors.Select(e => e.Description))));
+    }
 
-    // Stub so the class still satisfies IIdentityService while the body above is
-    // commented out. Fill it in, or drop AssignRoleAsync from the interface.
-    public Task<Result> AssignRoleAsync(Guid userId, string role, CancellationToken cancellationToken = default)
-        => Task.FromResult(Result.Success());
 
     public async Task<Result<AuthenticatedUser>> GetUserAsync(
         Guid userId,

@@ -47,22 +47,40 @@ public sealed class DatabaseSeeder(
             if (role is null)
             {
                 role = new ApplicationRole(roleName);
-                await roleManager.CreateAsync(role);
+
+                var result = await roleManager.CreateAsync(role);
+
+                if (!result.Succeeded)
+                {
+                    logger.LogError(
+                        "Failed to seed role {Role}: {Errors}",
+                        roleName,
+                        string.Join("; ", result.Errors.Select(e => e.Description)));
+
+                    continue;
+                }
+
                 logger.LogInformation("Seeded role {Role}", roleName);
             }
 
-            // The administrator holds every declared permission; other roles are
-            // configured by the customer at runtime.
-            if (roleName != Roles.Administrator)
-                continue;
+            var permissions = roleName switch
+            {
+                Roles.Administrator => Permissions.All,
+                Roles.AcademyAdministrator => Permissions.AdminPermissions,
+                _ => []
+            };
 
             var existing = (await roleManager.GetClaimsAsync(role))
                 .Where(c => c.Type == ErpClaims.Permission)
                 .Select(c => c.Value)
                 .ToHashSet();
 
-            foreach (var permission in Permissions.All.Where(p => !existing.Contains(p)))
-                await roleManager.AddClaimAsync(role, new Claim(ErpClaims.Permission, permission));
+            foreach (var permission in permissions.Where(p => !existing.Contains(p)))
+            {
+                await roleManager.AddClaimAsync(
+                    role,
+                    new Claim(ErpClaims.Permission, permission));
+            }
         }
     }
 

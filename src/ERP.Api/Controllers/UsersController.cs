@@ -48,23 +48,22 @@ public sealed class UsersController(
     /// <summary>
     /// Assigns a role to an existing user.
     /// </summary>
-    //[HttpPost("{id:guid}/roles")]
-    //[Consumes("application/json")]
-    //[ProducesResponseType(StatusCodes.Status204NoContent)]
-    //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-    //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    //[ProducesResponseType(StatusCodes.Status403Forbidden)]
-    //[ProducesResponseType(StatusCodes.Status404NotFound)]
-    //public async Task<IActionResult> AssignRole(
-    //    Guid id,
-    //    [FromBody] AssignRoleRequest request,
-    //    CancellationToken cancellationToken)
-    //{
-    //    var result = await identityService.(
-    //        id,
-    //        request.Role,
-    //        cancellationToken);
+    [HttpPost("assignRole")]
+    [Consumes("application/json")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> AssignRole(
+        [FromBody] AssignRoleRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await identityService.AssignRoleAsync(
+            request.UserId,
+            request.Role,
+            cancellationToken);
 
-    //    return ToActionResult(result);
-    //}
+        return ToActionResult(result);
+    }
 }

@@ -6,5 +6,5 @@ namespace ERP.Application.Modules.User.Contracts
             string Password,
             Guid TenantId);
 
-
+    public record AssignRoleRequest(Guid UserId, string Role);  
 }

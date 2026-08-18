@@ -26,8 +26,6 @@ public static class Permissions
     Academy.ViewAcademy,
     Academy.ViewPlayers,
     Academy.CreatePlayer,
-    Academy.UpdatePlayer,
-    Academy.DeletePlayer
 ];
     public static IReadOnlyList<string> All =>
     [
@@ -46,5 +44,5 @@ public static class Roles
     public const string Administrator = "Administrator";
     public const string Viewer = "Viewer";
     public const string AcademyAdministrator = "AcademyAdministrator"; 
-    public static IReadOnlyList<string> All => [Administrator, Viewer];
+    public static IReadOnlyList<string> All => [Administrator, Viewer , AcademyAdministrator];
 }
