@@ -1,13 +1,16 @@
+using ERP.Application.Common.Abstractions.Identity;
+using ERP.Application.Common.Abstractions.Services;
+using ERP.Application.Modules.User.Contracts;
+using ERP.Domain.Common.Results;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using ERP.Application.Common.Abstractions.Identity;
-using ERP.Application.Common.Abstractions.Services;
-using ERP.Domain.Common.Results;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 
 namespace ERP.Infrastructure.Identity;
 
@@ -29,11 +32,32 @@ public sealed class IdentityService(
         string password,
         CancellationToken cancellationToken = default)
     {
-       
+        var user = await userManager.FindByNameAsync(userName);
 
-        return Result.Success(await IssueTokensAsync(null));
+        if (user is null)
+            return Result.Failure<AuthTokens>(
+                IdentityErrors.InvalidCredentials);
+
+        if (!user.IsActive)
+            return Result.Failure<AuthTokens>(
+                IdentityErrors.UserInactive);
+
+        var result = await signInManager.CheckPasswordSignInAsync(
+            user,
+            password,
+            lockoutOnFailure: true);
+
+        if (result.IsLockedOut)
+            return Result.Failure<AuthTokens>(
+                IdentityErrors.UserLockedOut);
+
+        if (!result.Succeeded)
+            return Result.Failure<AuthTokens>(
+                IdentityErrors.InvalidCredentials);
+
+        return Result.Success(
+            await IssueTokensAsync(user));
     }
-
     public async Task<Result<Guid>> RegisterAsync(
         string userName,
         string email,
@@ -41,56 +65,130 @@ public sealed class IdentityService(
         Guid tenantId,
         CancellationToken cancellationToken = default)
     {
-        
-        return Result.Success(new Guid());
+        var existingUser = await userManager.FindByNameAsync(userName);
+
+        if (existingUser is not null)
+            return Result.Failure<Guid>(
+                IdentityErrors.RegistrationFailed);
+
+        var existingEmail = await userManager.FindByEmailAsync(email);
+
+        if (existingEmail is not null)
+            return Result.Failure<Guid>(
+                IdentityErrors.RegistrationFailed);
+
+        var user = new ApplicationUser
+        {
+            Id = Guid.NewGuid(),
+            UserName = userName,
+            Email = email,
+            TenantId = tenantId,
+            PreferredCulture = CultureInfo.InvariantCulture.Name,
+            IsActive = true
+        };
+
+        var result = await userManager.CreateAsync(
+            user,
+            password);
+
+        if (!result.Succeeded)
+        {
+            return Result.Failure<Guid>(
+                Error.Validation(
+                    "Identity.RegistrationFailed",
+                    string.Join(
+                        " ",
+                        result.Errors.Select(e => e.Description))));
+        }
+
+        return Result.Success(user.Id);
     }
 
     public async Task<Result<AuthTokens>> RefreshAsync(
         string refreshToken,
         CancellationToken cancellationToken = default)
     {
-      
-        return Result.Success(await IssueTokensAsync(null));
+
+        var user = await userManager.Users
+            .FirstOrDefaultAsync(
+                u => u.RefreshToken == refreshToken,
+                cancellationToken);
+
+        if (user is null)
+            return Result.Failure<AuthTokens>(
+                IdentityErrors.InvalidRefreshToken);
+
+        if (!user.IsActive)
+            return Result.Failure<AuthTokens>(
+                IdentityErrors.UserInactive);
+
+        if (user.RefreshTokenExpiresAtUtc is null ||
+            user.RefreshTokenExpiresAtUtc <= dateTime.UtcNow)
+        {
+            return Result.Failure<AuthTokens>(
+                IdentityErrors.InvalidRefreshToken);
+        }
+
+        return Result.Success(
+            await IssueTokensAsync(user));
     }
 
-    //public async Task<Result> AssignRoleAsync(Guid userId, string role, CancellationToken cancellationToken = default)
-    //{
-    //    var user = await userManager.FindByIdAsync(userId.ToString());
-    //    if (user is null)
-    //        return Result.Failure(IdentityErrors.UserNotFound);
-
-    //    if (!await roleManager.RoleExistsAsync(role))
-    //        return Result.Failure(IdentityErrors.RoleNotFound);
-
-    //    var result = await userManager.AddToRoleAsync(user, role);
-
-    //    return result.Succeeded
-    //        ? Result.Success()
-    //        : Result.Failure(Error.Failure("Identity.RoleAssignmentFailed",
-    //            string.Join(" ", result.Errors.Select(e => e.Description))));
-    //}
-
-    // Stub so the class still satisfies IIdentityService while the body above is
-    // commented out. Fill it in, or drop AssignRoleAsync from the interface.
-    public Task<Result> AssignRoleAsync(Guid userId, string role, CancellationToken cancellationToken = default)
-        => Task.FromResult(Result.Success());
-
-    public async Task<Result<AuthenticatedUser>> GetUserAsync(
-        Guid userId,
-        CancellationToken cancellationToken = default)
+    public async Task<Result> AssignRoleAsync(Guid userId, string role, CancellationToken cancellationToken = default)
     {
         var user = await userManager.FindByIdAsync(userId.ToString());
         if (user is null)
-            return Result.Failure<AuthenticatedUser>(IdentityErrors.UserNotFound);
+            return Result.Failure(IdentityErrors.UserNotFound);
 
-        var roles = await userManager.GetRolesAsync(user);
+        if (!await roleManager.RoleExistsAsync(role))
+            return Result.Failure(IdentityErrors.RoleNotFound);
 
-        return Result.Success(new AuthenticatedUser(
+        var result = await userManager.AddToRoleAsync(user, role);
+
+        return result.Succeeded
+            ? Result.Success()
+            : Result.Failure(Error.Failure("Identity.RoleAssignmentFailed",
+                string.Join(" ", result.Errors.Select(e => e.Description))));
+    }
+
+
+public async Task<Result<AuthenticatedUser>> GetUserAsync(
+    Guid userId,
+    CancellationToken cancellationToken = default)
+{
+    var user = await userManager.FindByIdAsync(userId.ToString());
+
+    if (user is null)
+        return Result.Failure<AuthenticatedUser>(
+            IdentityErrors.UserNotFound);
+
+    var roles = await userManager.GetRolesAsync(user);
+
+    var permissions = new HashSet<string>();
+
+    foreach (var roleName in roles)
+    {
+        var role = await roleManager.FindByNameAsync(roleName);
+
+        if (role is null)
+            continue;
+
+        var claims = await roleManager.GetClaimsAsync(role);
+
+        foreach (var claim in claims)
+        {
+            if (claim.Type == ErpClaims.Permission)
+                permissions.Add(claim.Value);
+        }
+    }
+
+    return Result.Success(
+        new AuthenticatedUser(
             user.Id,
             user.UserName ?? string.Empty,
             user.Email ?? string.Empty,
-            [.. roles]));
-    }
+            [.. roles],
+            [.. permissions]));
+}
 
     private async Task<AuthTokens> IssueTokensAsync(ApplicationUser user)
     {
@@ -142,6 +240,25 @@ public sealed class IdentityService(
         await userManager.UpdateAsync(user);
 
         return new AuthTokens(accessToken, expiresAt, refreshToken);
+    }
+
+public async Task<Result<IReadOnlyList<UserDto>>> GetUsersAsync(
+    CancellationToken cancellationToken = default)
+{
+    var users = await userManager.Users
+        .AsNoTracking()
+        .Select(u => new UserDto(
+            u.Id,
+            u.UserName ?? string.Empty,
+            u.Email ?? string.Empty))
+        .ToListAsync(cancellationToken);
+
+    return Result.Success<IReadOnlyList<UserDto>>(users);
+}
+
+    public Task<bool> AnyUsersByIdAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return userManager.Users.AnyAsync(u => u.Id == id , cancellationToken); 
     }
 }
 

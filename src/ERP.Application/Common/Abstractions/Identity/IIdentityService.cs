@@ -1,10 +1,11 @@
+using ERP.Application.Modules.User.Contracts;
 using ERP.Domain.Common.Results;
 
 namespace ERP.Application.Common.Abstractions.Identity;
 
 public sealed record AuthTokens(string AccessToken, DateTimeOffset ExpiresAtUtc, string RefreshToken);
 
-public sealed record AuthenticatedUser(Guid UserId, string UserName, string Email, IReadOnlyList<string> Roles);
+public sealed record AuthenticatedUser(Guid UserId, string UserName, string Email, IReadOnlyList<string> Roles, IReadOnlyList<string> Permissions);
 
 /// <summary>
 /// ASP.NET Core Identity lives entirely in Infrastructure. The Application layer
@@ -20,10 +21,10 @@ public interface IIdentityService
         string password,
         Guid tenantId,
         CancellationToken cancellationToken = default);
-
+    Task<Result<IReadOnlyList<UserDto>>> GetUsersAsync(CancellationToken cancellationToken = default);
     Task<Result<AuthTokens>> RefreshAsync(string refreshToken, CancellationToken cancellationToken = default);
 
-  //  Task<Result> AssignRoleAsync(Guid userId, string role, CancellationToken cancellationToken = default);
-
+    Task<Result> AssignRoleAsync(Guid userId, string role, CancellationToken cancellationToken = default);
+    Task<bool> AnyUsersByIdAsync(Guid id , CancellationToken cancellationToken); 
     Task<Result<AuthenticatedUser>> GetUserAsync(Guid userId, CancellationToken cancellationToken = default);
 }

@@ -32,4 +32,6 @@ public class Academy : Entity, IAuditable, ISoftDeletable
     public string? CreatedBy { get; set; }
     public DateTimeOffset? ModifiedAtUtc { get; set; }
     public string? ModifiedBy { get; set; }
+    public ICollection<AcademyAdministrator> Administrators { get; private set; }
+    = new List<AcademyAdministrator>();
 }
