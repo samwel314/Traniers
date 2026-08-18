@@ -1,5 +1,6 @@
 using ERP.Application.Common.Abstractions.Identity;
 using ERP.Application.Common.Abstractions.Services;
+using ERP.Application.Modules.User.Contracts;
 using ERP.Domain.Common.Results;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -222,6 +223,20 @@ public sealed class IdentityService(
 
         return new AuthTokens(accessToken, expiresAt, refreshToken);
     }
+
+public async Task<Result<IReadOnlyList<UserDto>>> GetUsersAsync(
+    CancellationToken cancellationToken = default)
+{
+    var users = await userManager.Users
+        .AsNoTracking()
+        .Select(u => new UserDto(
+            u.Id,
+            u.UserName ?? string.Empty,
+            u.Email ?? string.Empty))
+        .ToListAsync(cancellationToken);
+
+    return Result.Success<IReadOnlyList<UserDto>>(users);
+}
 }
 
 /// <summary>Error codes mirrored by the Identity.* keys in ar.json / en.json.</summary>
