@@ -51,8 +51,11 @@
       "GenderRequired": "Trainee gender is required.",
       "InvalidPhoto": "The trainee photo is invalid.",
       "ParentNotFound": "The specified parent was not found.",
-      "AcademyNotFound": "The specified academy was not found."
+      "AcademyNotFound": "The specified academy was not found.",
+      "InvalidRegistration": "The registration type is invalid for this phone number."
     },
+
+    "TraineeAlreadyExists": "The trainee is already registered in this academy.",
     "NameAlreadyExists": "Academy name already exists.",
     "InvalidLogo": "The provided logo is invalid.",
     "NotFound": "Academy was not found."
