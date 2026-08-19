@@ -4,6 +4,7 @@ using ERP.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ERP.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260818121256_AddTraineeTable")]
+    partial class AddTraineeTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -303,6 +306,68 @@ namespace ERP.Infrastructure.Persistence.Migrations
                     b.ToTable("AcademyTrainees", (string)null);
                 });
 
+            modelBuilder.Entity("ERP.Domain.Modules.Trainee.Entities.Parent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Age")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<DateTimeOffset?>("DeletedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("Gender")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTimeOffset?>("ModifiedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Photo")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PhoneNumber");
+
+                    b.ToTable("Parents", (string)null);
+                });
+
             modelBuilder.Entity("ERP.Domain.Modules.Trainee.Entities.Trainee", b =>
                 {
                     b.Property<Guid>("Id")
@@ -359,9 +424,6 @@ namespace ERP.Infrastructure.Persistence.Migrations
                     b.Property<string>("Photo")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -640,13 +702,13 @@ namespace ERP.Infrastructure.Persistence.Migrations
                     b.HasOne("ERP.Domain.Modules.Academy.Entities.Academy", "Academy")
                         .WithMany("Trainees")
                         .HasForeignKey("AcademyId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("ERP.Domain.Modules.Trainee.Entities.Trainee", "Trainee")
                         .WithMany("Academies")
                         .HasForeignKey("TraineeId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Academy");
@@ -656,10 +718,10 @@ namespace ERP.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("ERP.Domain.Modules.Trainee.Entities.Trainee", b =>
                 {
-                    b.HasOne("ERP.Domain.Modules.Trainee.Entities.Trainee", "Parent")
+                    b.HasOne("ERP.Domain.Modules.Trainee.Entities.Parent", "Parent")
                         .WithMany("Trainees")
                         .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Parent");
                 });
@@ -722,11 +784,14 @@ namespace ERP.Infrastructure.Persistence.Migrations
                     b.Navigation("Trainees");
                 });
 
+            modelBuilder.Entity("ERP.Domain.Modules.Trainee.Entities.Parent", b =>
+                {
+                    b.Navigation("Trainees");
+                });
+
             modelBuilder.Entity("ERP.Domain.Modules.Trainee.Entities.Trainee", b =>
                 {
                     b.Navigation("Academies");
-
-                    b.Navigation("Trainees");
                 });
 #pragma warning restore 612, 618
         }

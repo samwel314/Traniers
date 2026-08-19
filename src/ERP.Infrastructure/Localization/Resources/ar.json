@@ -41,6 +41,21 @@
       "FeeNegative": "الاشتراك الشهري لا يمكن أن يكون بالسالب.",
       "EnrollmentDateInFuture": "تاريخ الالتحاق لا يمكن أن يكون في المستقبل."
     },
+    "Trainee": {
+      "NotFound": "المتدرب المطلوب غير موجود.",
+      "FirstNameRequired": "الاسم الأول للمتدرب مطلوب.",
+      "LastNameRequired": "اسم العائلة للمتدرب مطلوب.",
+      "PhoneRequired": "رقم هاتف المتدرب مطلوب.",
+      "PhoneInvalidFormat": "رقم هاتف المتدرب غير صحيح. الصيغة المتوقعة: 01xxxxxxxxx.",
+      "AgeOutOfRange": "سن المتدرب يجب أن يكون بين {0} و {1} سنة.",
+      "GenderRequired": "نوع المتدرب مطلوب.",
+      "InvalidPhoto": "الصورة المرفقة للمتدرب غير صالحة.",
+      "ParentNotFound": "ولي الأمر المحدد غير موجود.",
+      "AcademyNotFound": "الأكاديمية المحددة غير موجودة.",
+      "InvalidRegistration": "نوع التسجيل غير صالح لرقم الهاتف المحدد."
+    },
+
+    "TraineeAlreadyExists": "المتدرب مسجل بالفعل في هذه الأكاديمية.",
     "NameAlreadyExists": "اسم الأكاديمية موجود بالفعل.",
     "InvalidLogo": "الشعار المرفق غير صالح.",
     "NotFound": "الأكاديمية المطلوبة غير موجودة."

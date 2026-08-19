@@ -34,4 +34,5 @@ public class Academy : Entity, IAuditable, ISoftDeletable
     public string? ModifiedBy { get; set; }
     public ICollection<AcademyAdministrator> Administrators { get; private set; }
     = new List<AcademyAdministrator>();
+    public ICollection<ERP.Domain.Modules.Trainee.Entities.AcademyTrainee> Trainees  { get; set; } = new List<ERP.Domain.Modules.Trainee.Entities.AcademyTrainee>();
 }
