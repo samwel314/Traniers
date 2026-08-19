@@ -2,6 +2,7 @@ using ERP.Application.Common.Abstractions.Persistence;
 using ERP.Application.Common.Abstractions.Services;
 using ERP.Domain.Common;
 using ERP.Domain.Modules.Academy.Entities;
+using ERP.Domain.Modules.Trainee.Entities;
 using ERP.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -30,7 +31,8 @@ public sealed class ApplicationDbContext(
     public bool IgnoreTenantFilter { get; set; }
     public DbSet<AcademyAdministrator> AcademyAdministrators {  get; set; }
     public DbSet<Academy> Academies { get; set;  }
-
+    public DbSet<AcademyTrainee> AcademyTrainees {  get; set; }
+    public DbSet<Trainee> Trainees { get; set; }    
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

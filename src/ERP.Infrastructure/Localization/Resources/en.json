@@ -41,6 +41,18 @@
       "FeeNegative": "Monthly fee cannot be negative.",
       "EnrollmentDateInFuture": "Enrollment date cannot be in the future."
     },
+    "Trainee": {
+      "NotFound": "The requested trainee was not found.",
+      "FirstNameRequired": "Trainee first name is required.",
+      "LastNameRequired": "Trainee last name is required.",
+      "PhoneRequired": "Trainee phone number is required.",
+      "PhoneInvalidFormat": "Trainee phone number is invalid. Expected format: 01xxxxxxxxx.",
+      "AgeOutOfRange": "Trainee age must be between {0} and {1} years.",
+      "GenderRequired": "Trainee gender is required.",
+      "InvalidPhoto": "The trainee photo is invalid.",
+      "ParentNotFound": "The specified parent was not found.",
+      "AcademyNotFound": "The specified academy was not found."
+    },
     "NameAlreadyExists": "Academy name already exists.",
     "InvalidLogo": "The provided logo is invalid.",
     "NotFound": "Academy was not found."
