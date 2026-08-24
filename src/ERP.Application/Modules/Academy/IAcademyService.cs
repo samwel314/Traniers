@@ -25,7 +25,7 @@ namespace ERP.Application.Modules.Academy
 
         Task<Result<PagedList<AcademyLockupDto>>> GetAllAcademiesAsync(
             int page = 1,
-            int pageSize = 5,
+            int pageSize = 5, string? searchTerm = null,
             CancellationToken cancellation = default);
 
         Task<Result> DeleteAcademyAsync(

@@ -4,7 +4,7 @@ namespace ERP.Application.Common.Abstractions.Services;
 
 public interface IImageService
 {
-    bool IsValidImage(IFormFile file);
+    Task<bool> IsValidImageAsync(IFormFile file);
 
     Task<string> SaveImageAsync(
         IFormFile file,

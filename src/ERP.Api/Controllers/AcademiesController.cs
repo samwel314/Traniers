@@ -5,12 +5,13 @@ using ERP.Application.Modules.Academy.AcademyInput;
 using ERP.Application.Modules.Academy.AcademyOutput;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Runtime.CompilerServices;
 
 namespace ERP.Api.Controllers;
 
 [Route("api/[controller]")]
 [Tags("Academies")]
-[Authorize(Roles = Roles.Administrator)]
+//[Authorize(Roles = Roles.Administrator)]
 
 public class AcademiesController : ApiControllerBase
 {
@@ -92,12 +93,12 @@ public class AcademiesController : ApiControllerBase
         StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll(
         [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 5,
+        [FromQuery] int pageSize = 5, [FromQuery] string? searchTerm = null,
         CancellationToken cancellationToken = default)
     {
         var result = await _academyService.GetAllAcademiesAsync(
             page,
-            pageSize,
+            pageSize, searchTerm , 
             cancellationToken);
 
         return ToActionResult(result);

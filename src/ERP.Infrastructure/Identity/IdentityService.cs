@@ -108,10 +108,12 @@ public sealed class IdentityService(
         string refreshToken,
         CancellationToken cancellationToken = default)
     {
-
+        var hash = SHA256.HashData(
+            Encoding.UTF8.GetBytes(refreshToken));
+        var hashString = Convert.ToBase64String(hash);
         var user = await userManager.Users
             .FirstOrDefaultAsync(
-                u => u.RefreshToken == refreshToken,
+                u => u.RefreshToken == hashString,
                 cancellationToken);
 
         if (user is null)
@@ -235,7 +237,11 @@ public async Task<Result<AuthenticatedUser>> GetUserAsync(
         var accessToken = new JwtSecurityTokenHandler().WriteToken(token);
 
         var refreshToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
-        user.RefreshToken = refreshToken;
+        var hash = SHA256.HashData(
+            Encoding.UTF8.GetBytes(refreshToken));
+        var hashString = Convert.ToBase64String(hash);
+
+        user.RefreshToken = hashString;
         user.RefreshTokenExpiresAtUtc = dateTime.UtcNow.AddDays(_jwt.RefreshTokenDays);
         await userManager.UpdateAsync(user);
 

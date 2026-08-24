@@ -153,6 +153,13 @@ public static class PresentationServices
                 In = ParameterLocation.Header,
                 Description = "Paste the JWT here. The 'Bearer ' prefix is added for you."
             });
+            options.AddSecurityDefinition("AcceptLanguage", new OpenApiSecurityScheme
+            {
+                Name = "Accept-Language",
+                Type = SecuritySchemeType.ApiKey,
+                In = ParameterLocation.Header,
+                Description = "Response language. Example: ar or en."
+            });
 
             options.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
@@ -168,9 +175,22 @@ public static class PresentationServices
                     Array.Empty<string>()
                 }
             });
-
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+{
+    {
+        new OpenApiSecurityScheme
+        {
+            Reference = new OpenApiReference
+            {
+                Type = ReferenceType.SecurityScheme,
+                Id = "AcceptLanguage"
+            }
+        },
+        Array.Empty<string>()
+    }
+});
             // Lets a tester switch the response language straight from Swagger UI.
-            options.OperationFilter<AcceptLanguageHeaderOperationFilter>();
+            //      options.OperationFilter<AcceptLanguageHeaderOperationFilter>();
 
             var xmlFile = $"{typeof(PresentationServices).Assembly.GetName().Name}.xml";
             var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);

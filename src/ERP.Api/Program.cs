@@ -44,6 +44,7 @@ try
     // =====================================================================
 
     // 1. Exceptions first, so it wraps everything below it.
+    app.UseStaticFiles();   
     app.UseExceptionHandler();
     app.UseStatusCodePages();
 
@@ -160,7 +161,7 @@ static async Task InitializeDatabaseAsync(WebApplication app)
 
     using var scope = app.Services.CreateScope();
     var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
-
+    
     await seeder.MigrateAsync();
     await seeder.SeedAsync();
 }

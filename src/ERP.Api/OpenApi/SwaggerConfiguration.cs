@@ -17,10 +17,11 @@ public sealed class AcceptLanguageHeaderOperationFilter : IOperationFilter
 
         operation.Parameters.Add(new OpenApiParameter
         {
+
             Name = "Accept-Language",
             In = ParameterLocation.Header,
             Required = false,
-            Description = "Response language.",
+            Description = "Response language.",             
             Schema = new OpenApiSchema
             {
                 Type = "string",

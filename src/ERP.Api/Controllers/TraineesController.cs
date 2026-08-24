@@ -11,7 +11,7 @@ namespace ERP.Api.Controllers;
 
 [Route("api/[controller]")]
 [Tags("Trainees")]
-[Authorize(Roles = Roles.AcademyAdministrator)]
+//[Authorize(Roles = Roles.AcademyAdministrator)]
 public class TraineesController : ApiControllerBase
 {
     private readonly ITraineeService _traineeService;

@@ -64,7 +64,7 @@ namespace ERP.Application.Modules.Academy
 
                 // Business rule: logo must be a valid image
                 if (request.Logo is not null &&
-                    !_imageService.IsValidImage(request.Logo))
+                    !await _imageService.IsValidImageAsync(request.Logo))
                 {
                     return Result.Failure<AcademyResponseDto>(
                         Error.Validation(
@@ -165,7 +165,7 @@ namespace ERP.Application.Modules.Academy
 
         public async Task<Result<PagedList<AcademyLockupDto>>> GetAllAcademiesAsync(
             int page = 1,
-            int pageSize = 5,
+            int pageSize = 5, string ? searchTerm = null,
             CancellationToken cancellation = default)
         {
             try
@@ -175,7 +175,17 @@ namespace ERP.Application.Modules.Academy
 
                 var query = _dbContext.Academies
                     .AsNoTracking()
-                    .Where(a => !a.IsDeleted);
+                    .Where(a => !a.IsDeleted); 
+
+                // add search 
+                searchTerm = searchTerm?.Trim();
+
+                if (!string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    query = query.Where(a =>
+                        a.NameAr.Contains(searchTerm) ||
+                        a.NameEn.Contains(searchTerm));
+                }
 
                 var totalCount = await query.CountAsync(cancellation);
 
@@ -265,7 +275,7 @@ namespace ERP.Application.Modules.Academy
 
                 // Business rule: logo validation
                 if (request.Logo is not null &&
-                    !_imageService.IsValidImage(request.Logo))
+                    !await _imageService.IsValidImageAsync(request.Logo))
                 {
                     return Result.Failure<AcademyResponseDto>(
                         Error.Validation(
@@ -275,7 +285,7 @@ namespace ERP.Application.Modules.Academy
 
                 // Map request -> existing entity
                 academy.UpdateFromRequest(request);
-
+                
                 if (request.Logo is not null)
                 {
                     if (!string.IsNullOrWhiteSpace(academy.LogoPath))

@@ -7,6 +7,7 @@ using ERP.Application.Modules.Trainee.TraineeInput;
 using ERP.Application.Modules.Trainee.TraineeOutput;
 using ERP.Domain.Common.Results;
 using ERP.Domain.Modules.Trainee.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -290,26 +291,7 @@ namespace ERP.Application.Modules.Trainee
             try
             {
                 // Normalize input
-                request.FirstName =
-                    request.FirstName?.Trim() ?? string.Empty;
-
-                request.LastName =
-                    request.LastName?.Trim() ?? string.Empty;
-
-                request.PhoneNumber =
-                    request.PhoneNumber?.Trim() ?? string.Empty;
-
-                foreach (var child in request.Children)
-                {
-                    child.FirstName =
-                        child.FirstName?.Trim() ?? string.Empty;
-
-                    child.LastName =
-                        child.LastName?.Trim() ?? string.Empty;
-
-                    child.PhoneNumber =
-                        child.PhoneNumber?.Trim() ?? string.Empty;
-                }
+                NormalizeRequest(request);
 
                 // FluentValidation
                 await _validator.ValidateAsync(
@@ -355,21 +337,16 @@ namespace ERP.Application.Modules.Trainee
                 {
                     var trainee = request.ToEntity();
 
-                    if (request.Photo is not null)
-                    {
-                        if (!_imageService.IsValidImage(request.Photo))
-                        {
-                            return Result.Failure<TraineeResponseDto>(
-                                Error.Validation(
-                                    "Trainee.InvalidPhoto",
-                                    "The trainee photo is invalid."));
-                        }
+                    var photoResult = await HandlePhotoAsync(
+                        request.Photo);
 
-                        trainee.Photo =
-                            await _imageService.SaveImageAsync(
-                                request.Photo,
-                                "Trainees");
+                    if (photoResult.IsFailure)
+                    {
+                        return Result.Failure<TraineeResponseDto>(
+                            photoResult.Error);
                     }
+
+                    trainee.Photo = photoResult.Value;
 
                     await _dbContext.Trainees.AddAsync(
                         trainee,
@@ -399,21 +376,16 @@ namespace ERP.Application.Modules.Trainee
 
                 parent.Type = RegistrationType.Parent;
 
-                if (request.Photo is not null)
-                {
-                    if (!_imageService.IsValidImage(request.Photo))
-                    {
-                        return Result.Failure<TraineeResponseDto>(
-                            Error.Validation(
-                                "Trainee.InvalidPhoto",
-                                "The parent photo is invalid."));
-                    }
+                var parentPhotoResult = await HandlePhotoAsync(
+                    request.Photo);
 
-                    parent.Photo =
-                        await _imageService.SaveImageAsync(
-                            request.Photo,
-                            "Trainees");
+                if (parentPhotoResult.IsFailure)
+                {
+                    return Result.Failure<TraineeResponseDto>(
+                        parentPhotoResult.Error);
                 }
+
+                parent.Photo = parentPhotoResult.Value;
 
                 await _dbContext.Trainees.AddAsync(
                     parent,
@@ -424,22 +396,16 @@ namespace ERP.Application.Modules.Trainee
                     var child = childRequest.ToEntity(
                         parent.Id);
 
-                    if (childRequest.Photo is not null)
-                    {
-                        if (!_imageService.IsValidImage(
-                                childRequest.Photo))
-                        {
-                            return Result.Failure<TraineeResponseDto>(
-                                Error.Validation(
-                                    "Trainee.InvalidPhoto",
-                                    "The trainee photo is invalid."));
-                        }
+                    var childPhotoResult = await HandlePhotoAsync(
+                        childRequest.Photo);
 
-                        child.Photo =
-                            await _imageService.SaveImageAsync(
-                                childRequest.Photo,
-                                "Trainees");
+                    if (childPhotoResult.IsFailure)
+                    {
+                        return Result.Failure<TraineeResponseDto>(
+                            childPhotoResult.Error);
                     }
+
+                    child.Photo = childPhotoResult.Value;
 
                     await _dbContext.Trainees.AddAsync(
                         child,
@@ -461,7 +427,6 @@ namespace ERP.Application.Modules.Trainee
                 return Result.Success(
                     parent.ToResponse());
             }
-  
             catch (Exception ex)
             {
                 _logger.LogError(
@@ -471,9 +436,42 @@ namespace ERP.Application.Modules.Trainee
                 throw;
             }
         }
+        private static void NormalizeRequest(CreateTraineeRequest request)
+        {
+            request.FirstName = request.FirstName?.Trim() ?? string.Empty;
+            request.LastName = request.LastName?.Trim() ?? string.Empty;
+            request.PhoneNumber = request.PhoneNumber?.Trim() ?? string.Empty;
 
+            foreach (var child in request.Children)
+            {
+                child.FirstName = child.FirstName?.Trim() ?? string.Empty;
+                child.LastName = child.LastName?.Trim() ?? string.Empty;
+                child.PhoneNumber = child.PhoneNumber?.Trim() ?? string.Empty;
+            }
+        }
+        private async Task<Result<string?>> HandlePhotoAsync(IFormFile? file)
+        {
+            if (file is null)
+                return Result.Success<string?>(null);
+
+            if (!await _imageService.IsValidImageAsync(file))
+            {
+                return Result.Failure<string?>(
+                    Error.Validation(
+                        "Trainee.InvalidPhoto",
+                        "The trainee photo is invalid."));
+            }
+
+            var path = await _imageService.SaveImageAsync(
+                file,
+                "Trainees");
+
+            return Result.Success<string?>(path);
+        }
 
     }
+
+
 }
 
     
