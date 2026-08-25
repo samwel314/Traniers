@@ -1,9 +1,11 @@
 using ERP.Api.Extensions;
 using ERP.Api.Middleware;
 using ERP.Application;
+using ERP.Application.Common.Abstractions.Services;
 using ERP.Application.Common.Validation;
 using ERP.Infrastructure;
 using ERP.Infrastructure.Persistence;
+using ERP.Infrastructure.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Localization;
@@ -33,7 +35,7 @@ try
     builder.Services.AddApplication();
     builder.Services.AddInfrastructure(builder.Configuration);
     builder.Services.AddPresentation(builder.Configuration);
-
+    builder.Services.AddScoped<IEmailService, EmailService>();
 
     var app = builder.Build();
 

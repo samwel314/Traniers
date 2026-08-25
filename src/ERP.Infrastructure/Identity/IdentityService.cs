@@ -4,6 +4,8 @@ using ERP.Application.Modules.User.Contracts;
 using ERP.Domain.Common.Results;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Globalization;
@@ -22,7 +24,7 @@ public sealed class IdentityService(
     UserManager<ApplicationUser> userManager,
     SignInManager<ApplicationUser> signInManager,
     RoleManager<ApplicationRole> roleManager,
-    IOptions<JwtOptions> jwtOptions,
+    IOptions<JwtOptions> jwtOptions, IEmailService emailService ,  IConfiguration configuration , ILogger<ApplicationUser> logger ,
     IDateTimeProvider dateTime) : IIdentityService
 {
     private readonly JwtOptions _jwt = jwtOptions.Value;
@@ -101,6 +103,42 @@ public sealed class IdentityService(
                         result.Errors.Select(e => e.Description))));
         }
 
+        try
+        {
+            var token = await userManager.GeneratePasswordResetTokenAsync(user);
+            // -*-* <<*>>>
+            var frontendUrl = configuration["FrontendUrl"];
+            Console.WriteLine("----------------------------");
+            Console.WriteLine(token);
+            Console.WriteLine("----------------------------");
+
+            var resetPasswordUrl =
+                $"{frontendUrl}/reset-password" +
+                $"?userId={user.Id}" +
+                $"&token={Uri.EscapeDataString(token)}";
+
+            await emailService.SendAsync(
+                user.Email!,
+                "Account Created Successfully",
+                $"""
+        <h2>Account Created Successfully</h2>
+
+        <p>Your account has been created successfully.</p>
+
+        <p>
+            If you want to reset your password, click the button below:
+        </p>
+
+        <a href="{resetPasswordUrl}">
+            Reset Password
+        </a>
+        """);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex, "Failed to send account creation email to user {UserId}",  user.Id);
+        }
         return Result.Success(user.Id);
     }
 
@@ -134,7 +172,38 @@ public sealed class IdentityService(
         return Result.Success(
             await IssueTokensAsync(user));
     }
+    public async Task<Result> HandleResetPassword(
+    ResetPasswordRequest request,
+    CancellationToken cancellationToken)
+    {
+        var user = await userManager.FindByIdAsync(
+            request.UserId.ToString());
 
+        if (user is null)
+        {
+            return Result.Failure(
+                Error.NotFound(
+                    "Identity.UserNotFound",
+                    "User was not found."));
+        }
+
+        var result = await userManager.ResetPasswordAsync(
+            user,
+            request.Token,
+            request.NewPassword);
+
+        if (!result.Succeeded)
+        {
+            return Result.Failure(
+                Error.Validation(
+                    "Identity.PasswordResetFailed",
+                    string.Join(
+                        " ",
+                        result.Errors.Select(e => e.Description))));
+        }
+
+        return Result.Success();
+    }
     public async Task<Result> AssignRoleAsync(Guid userId, string role, CancellationToken cancellationToken = default)
     {
         var user = await userManager.FindByIdAsync(userId.ToString());

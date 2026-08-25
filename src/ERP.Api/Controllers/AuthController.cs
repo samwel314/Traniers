@@ -110,5 +110,33 @@ public sealed class AuthController(
 
         return ToActionResult(result);
     }
+    [HttpPost("test-email")]
+    public async Task<IActionResult> TestEmail(
+    [FromServices] IEmailService emailService)
+    {
+        await emailService.SendAsync(
+            "samwelrezq45@gmail.com",
+            "Test Email",
+            "<h1>Email is working 🎉</h1><p>SMTP works successfully.</p>");
+
+        return Ok("Email sent successfully.");
+    }
+
+    [HttpPost("reset-password")]
+    [AllowAnonymous]
+    [Consumes("application/json")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ResetPassword(
+    [FromBody] ResetPasswordRequest request,
+    CancellationToken cancellationToken)
+    {
+        var result = await identityService.HandleResetPassword(
+            request,
+            cancellationToken);
+
+        return ToActionResult(result);
+    }
 
 }

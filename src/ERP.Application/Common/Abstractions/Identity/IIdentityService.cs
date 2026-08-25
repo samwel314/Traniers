@@ -14,7 +14,9 @@ public sealed record AuthenticatedUser(Guid UserId, string UserName, string Emai
 public interface IIdentityService
 {
     Task<Result<AuthTokens>> LoginAsync(string userName, string password, CancellationToken cancellationToken = default);
-
+    Task<Result> HandleResetPassword(
+    ResetPasswordRequest request,
+    CancellationToken cancellationToken); 
     Task<Result<Guid>> RegisterAsync(
         string userName,
         string email,
